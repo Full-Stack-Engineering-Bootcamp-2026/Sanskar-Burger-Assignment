@@ -1,0 +1,22 @@
+{
+  "name": "burger-backend",
+  "version": "1.0.0",
+  "description": "Burger shop application backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "author": "Sanskar Rajput",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.0",
+    "sequelize": "^6.37.8"
+  }
+}
