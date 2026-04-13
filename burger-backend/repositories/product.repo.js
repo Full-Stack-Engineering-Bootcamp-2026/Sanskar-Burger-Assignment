@@ -1,4 +1,4 @@
-const Product = require("../models/product.model");
+const {Product} = require("../models/index.model");
 
 exports.getProducts = async(filters) => {
     let filterConditions = {};

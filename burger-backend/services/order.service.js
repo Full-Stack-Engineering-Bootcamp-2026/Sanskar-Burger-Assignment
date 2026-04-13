@@ -1,63 +1,42 @@
 const orderRepo = require('../repositories/order.repo');
-const combos = [
-    {
-        name:"Veg Burger Combo",
-        items:["Paneer Burger","Coke 500ml"],
-        price:199
-    },
-    {
-        name:"Chicken Burger Combo",
-        items:["Chicken Burger","Coke 600ml"],
-        price:249
-    },
-    {
-        name:"Snack Combo",
-        items:["French Fries Regular","Garlic Bread","Coke 500ml"],
-        price:229
-    },
-    {
-        name:"Wrap Combo",
-        items:["Veg Wrap","French Fries Regular","Cold Coffee"],
-        price:279
-    },
-    {
-        name:"Party Combo",
-        items:["Chicken Burger","French Fries Large","Pepsi 600ml","Chicken Nuggets"],
-        price:499
-    }
-]
-
-const optimisedTotal = (items)=>{
+const comboRepo = require('../repositories/combo.repo');
+const comboLogic = async(items)=>{
+    const combos = await comboRepo.getCombos();
     let bill = 0;
+    let appliedCombos = [];
     const itemCount = {};
     items.forEach(item => {
-        itemCount[item.name] = (itemCount[item.name]||0) + item.quantity;
+        itemCount[item.id] = (itemCount[item.id]||0) + item.quantity;
     });
-    combos.sort((a,b)=> b.items.length - a.items.length);
+    combos.sort((a,b)=> b.ComboItems.length - a.ComboItems.length);
     combos.forEach(combo=>{
+        if(!combo.ComboItems || combo.ComboItems.length === 0) return;
         while(true){
             let comboApplicable = true;
-            for(let item of combo.items){
-                if(!itemCount[item] || itemCount[item]<0){
+            // let temp = {...itemCount};
+            for(let comboItem of combo.ComboItems){
+                if(!itemCount[comboItem.product_id] || itemCount[comboItem.product_id]<=0){
                     comboApplicable = false;
                     break;
                 }
+                itemCount[comboItem.product_id] -= 1;
             }
             if(!comboApplicable) break;
-            combo.items.forEach(item=>{
-                itemCount.item -= 1;
+            combo.ComboItems.forEach(comboItem=>{
+                itemCount[comboItem.product_id] -= 1;
             });
             bill += combo.price;
+            appliedCombos.push(combo.name);
         }
     });
     items.forEach(item=>{
-        const remainingItems = itemCount[item.name] || 0;
+        const remainingItems = itemCount[item.id] || 0;
         if(remainingItems > 0){
             bill += remainingItems * item.price;
-            itemCount[item.name] = 0;
+            itemCount[item.id] = 0;
         }
     });
-    return bill;
+    return {optimisedTotal:bill,appliedCombos};
 }
 
 
@@ -66,12 +45,21 @@ exports.getOrders = async()=>{
 }
 
 exports.checkout = async(data)=>{
-    const items = data.items;
-    const actualBill = data.total;
-    const optimisedBill = optimisedTotal(items);
-    return await orderRepo.createOrder({
-        ...data,
-        actualBill,
-        optimisedBill
-    })
+    const {user,items,calculateOptimizedTotal} = data;
+    const actualTotal = items.reduce((sum,item)=>sum + item.price * item.quantity,0);
+    const {optimisedTotal,appliedCombos} = await comboLogic(items);
+    if(calculateOptimizedTotal)
+        return {actualTotal,optimisedTotal,appliedCombos}
+    const orderDetails = {
+        user_name:user.name,
+        email:user.email,
+        actual_bill:actualTotal,
+        optimised_bill:optimisedTotal
+    };
+    await orderRepo.createOrder(orderDetails,items);
+    return {
+        actualTotal,
+        optimisedTotal,
+        appliedCombos
+    }
 }

@@ -1,19 +1,20 @@
-const Order = require("../models/order.model")
+const {Order,OrderItem} = require("../models/index.model");
 exports.getOrders = async()=>{
-    return await Order.findAll();
+    return await Order.findAll({
+        include:{model:OrderItem},
+        order:[["createdAt","DESC"]]
+    });
 }
 
-exports.createOrder = async(data)=>{
-    if(data.calculate){
-        return {
-            actualBill:data.actualBill,
-            optimisedBill:data.optimisedBill
-        }
-    }
-    return await Order.create({
-        user_name:data.user_name || "Spiderman",
-        email:data.email||"spiderman@spiderman.com",
-        actual_bill:data.actualBill,
-        optimised_bill:data.optimisedBill
-    });
+exports.createOrder = async(data,items)=>{
+    const order = await Order.create(data);
+    const orderItems = items.map(item=>({
+        order_id:order.id,
+        product_id:item.id,
+        quantity:item.quantity,
+        price:item.price
+    }));
+
+    await OrderItem.bulkCreate(orderItems);
+    return order;
 }

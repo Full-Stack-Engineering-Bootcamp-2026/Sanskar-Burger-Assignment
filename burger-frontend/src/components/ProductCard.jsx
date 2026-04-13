@@ -6,18 +6,18 @@ const iconMapping = {
   "SIDES": "🧽",
   "WRAP": "🌯",
   "PIZZA": "🍕",
-  "MEAL": "🍱"
+  "MEAL": "🍱",
 }
 
 const ProductCard = ({ product }) => {
-  const { name, price, category, type } = product
+  const { name, price, category, type,id } = product
   const getCart = () => {
     let cart = JSON.parse(localStorage.getItem('cart'))
     return cart ? cart : [];
   }
   const getQuantity = () => {
     let cart = getCart();
-    const existingItem = cart.find(item => item.name === name)
+    const existingItem = cart.find(item => item.id === id)
     if (existingItem)
       return existingItem.quantity
     return 0;
@@ -27,7 +27,7 @@ const ProductCard = ({ product }) => {
 
 
   const handleIncreaseClick = () => {
-    setQuantity(prev=>prev + 1);
+    setQuantity(prev => prev + 1);
     let cart = getCart();
     const existingItem = cart.find(item => item.name === name);
     if (existingItem) {
@@ -36,11 +36,11 @@ const ProductCard = ({ product }) => {
     }
     else {
       // cart.push({item,quantity:1});
-      cart.push({ name, price, category, type, quantity: 1 });
+      cart.push({ id,name, price, category, type, quantity: 1 });
     }
     saveCart(cart);
     console.log(cart);
-    
+
   }
   const handleDecreaseClick = () => {
     setQuantity(prev => prev - 1);
@@ -51,14 +51,14 @@ const ProductCard = ({ product }) => {
         cart = cart.filter(item => item.name !== name)
       else
         existingItem.quantity -= 1;
-      saveCart(cart);      
+      saveCart(cart);
     }
   }
 
   const handleAddToCartClick = () => {
     setQuantity(1);
     let cart = getCart();
-    cart.push({ name, price, category, type, quantity: 1 })
+    cart.push({ id,name, price, category, type, quantity: 1 })
     saveCart(cart);
   }
 
@@ -68,7 +68,7 @@ const ProductCard = ({ product }) => {
   }
   return (
 
-    <div className='shadow-md hover:shadow-2xl p-4 flex-col justify-evenly  w-80 h-70 text-center my-3 bg-[#1f1f1f] border rounded-2xl hover:scale-[1.02] transition duration-200'>
+    <div className='shadow-md hover:shadow-2xl p-4 flex-col justify-evenly  w-80 h-70 text-center my-3 bg-[#1f1f1f] border rounded-2xl hover:scale-[1.05] transition duration-200'>
       <div className='text-4xl'>
         <h1>{iconMapping[category]}</h1>
       </div>
@@ -83,7 +83,8 @@ const ProductCard = ({ product }) => {
 
         {quantity > 0 && <div className="bg-[#2a2a2a] mt-10 text-white font-extrabold flex justify-between w-full rounded-4xl ">
           <button disabled={!(quantity > 0)} onClick={handleDecreaseClick} className=" hover:bg-[#f6593b] text-white font-bold py-2 px-4 rounded">
-            {quantity === 1 ? <h1>⛔</h1> : <h1>-</h1>}
+            {quantity === 1 ? <h1>🗑️
+            </h1> : <h1>-</h1>}
           </button>
           <h1 className='py-2 px-4'>{quantity}</h1>
           <button disabled={!(quantity < 9)} onClick={handleIncreaseClick} className="hover:bg-[#f6593b] text-white font-bold py-2 px-4 rounded">

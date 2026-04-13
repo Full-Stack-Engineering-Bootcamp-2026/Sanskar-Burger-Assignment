@@ -1,16 +1,22 @@
 const orderService = require("../services/order.service");
-exports.getOrders = async(req,res)=>{
-    const orders = await orderService.getOrders();
-    res.json(orders);
-}
-
-exports.checkout = async(req,res)=>{
-    try{
-        const order = await orderService.checkout(req.body);
-        res.set('status',201);
-        res.json(order);
+exports.getOrders = async (req, res) => {
+    try {
+        console.log(req.body);
+        const orders = await orderService.getOrders();
+        res.json(orders);
     }
     catch(err){
-        return res.status(500).json({error:err.message})
+        res.status(500).json({error:err.message});
+    }
+    
+}
+
+exports.checkout = async (req, res) => {
+    try {
+        const order = await orderService.checkout(req.body);
+        res.status(201).json(order);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message })
     }
 }
