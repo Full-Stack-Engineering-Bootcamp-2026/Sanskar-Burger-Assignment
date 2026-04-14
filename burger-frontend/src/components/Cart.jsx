@@ -43,6 +43,10 @@ const Cart = () => {
     }
 
     const handlePlaceOrderClick = async()=>{
+        if(!user.name.trim() || !user.email.trim()){
+            toast.error("Enter user name and email!!");
+            return
+        }
         try{
             const response =await axios.post("http://localhost:3000/order/",{
                 user:{name:user.name || "Spiderman",email:user.email||"spiderman@test.com"},
@@ -98,7 +102,7 @@ const Cart = () => {
                 </div>
                 <div className='flex justify-between mt-6 text-xl font-bold text-white'>
                     <span>Optimised Total</span>
-                    <span className='text-orange-400'>₹{optimized}</span>
+                    <span className='text-orange-400'>₹{optimized===0?total:optimized}</span>
                 </div>
                 {form && (
                     <div className="mt-6 border-t border-gray-600 pt-4">

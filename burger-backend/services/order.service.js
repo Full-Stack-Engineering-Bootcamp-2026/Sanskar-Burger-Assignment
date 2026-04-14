@@ -13,13 +13,13 @@ const comboLogic = async(items)=>{
         if(!combo.ComboItems || combo.ComboItems.length === 0) return;
         while(true){
             let comboApplicable = true;
-            // let temp = {...itemCount};
+            let temp = {...itemCount};
             for(let comboItem of combo.ComboItems){
-                if(!itemCount[comboItem.product_id] || itemCount[comboItem.product_id]<=0){
+                if(!temp[comboItem.product_id] || temp[comboItem.product_id]<=0){
                     comboApplicable = false;
                     break;
                 }
-                itemCount[comboItem.product_id] -= 1;
+                temp[comboItem.product_id] -= 1;
             }
             if(!comboApplicable) break;
             combo.ComboItems.forEach(comboItem=>{
