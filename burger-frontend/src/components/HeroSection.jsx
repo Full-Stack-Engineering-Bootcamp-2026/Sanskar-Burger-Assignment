@@ -47,10 +47,10 @@ const HeroSection = ({ search }) => {
   //   fetchCombos();
   // },[])
 
-  const renderedProducts = products.map(product => {
+  const renderedProducts = products.length>0? products.map(product => {
 
     return <ProductCard key={product.id} product={product} />
-  })
+  }):<div className='flex justify-center min-h-screen text-6xl text-center font-extrabold text-white'><h1>No Products matching the filter</h1> </div>
 
   // const renderedCombos = combos.map(combo => {
 
